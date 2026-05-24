@@ -5,139 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Arcanus - أركانوس</title>
     <style>
-        :root {
-            --bg-color: #121212;
-            --surface-color: #1e1e1e;
-            --primary-color: #8ab4f8;
-            --text-color: #ffffff;
-            --text-secondary: #a0a0a0;
-        }
+        :root { --bg-color: #121212; --surface-color: #1e1e1e; --primary-color: #8ab4f8; --text-color: #ffffff; --text-secondary: #a0a0a0; }
+        body { margin: 0; font-family: system-ui, sans-serif; background-color: var(--bg-color); color: var(--text-color); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        header { padding: 16px 20px; background-color: var(--surface-color); font-size: 22px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10; display: flex; justify-content: space-between; align-items: center; }
+        main { flex: 1; overflow-y: auto; padding: 16px; }
+        
+        /* التبويبات */
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* شريط التنقل */
+        nav { display: flex; background-color: var(--surface-color); padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -1px 4px rgba(0,0,0,0.3); z-index: 10; }
+        .nav-item { flex: 1; padding: 12px 0; text-align: center; color: var(--text-secondary); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; }
+        .nav-item.active { color: var(--primary-color); }
+        .icon { font-size: 24px; }
+        
+        /* تصميم البطاقات */
+        .manga-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+        .manga-card { background-color: var(--surface-color); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 6px rgba(0,0,0,0.3); cursor: pointer; }
+        .manga-cover { width: 100%; height: 150px; object-fit: cover; background-color: #333; }
+        .manga-info { padding: 8px; }
+        .manga-title { font-size: 12px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0 0 4px 0; }
+        .manga-chapters { font-size: 10px; color: var(--primary-color); margin: 0; }
 
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
+        /* شاشة التفاصيل */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); z-index: 100; overflow-y: auto; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-header { padding: 16px; position: absolute; top: 0; right: 0; z-index: 101; }
+        .back-btn { background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px); }
+        .modal-banner { width: 100%; height: 250px; object-fit: cover; opacity: 0.5; mask-image: linear-gradient(to bottom, black 50%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
+        .modal-body { padding: 20px; margin-top: -100px; position: relative; z-index: 2; }
+        .modal-title { font-size: 24px; font-weight: bold; margin: 0 0 5px 0; }
+        .modal-author { color: var(--primary-color); font-size: 14px; margin: 0 0 15px 0; }
+        .modal-desc { font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin-bottom: 20px; }
+        .action-btn { background-color: var(--primary-color); color: #000; font-weight: bold; font-size: 16px; width: 100%; padding: 15px; border: none; border-radius: 8px; cursor: pointer; }
 
-        header {
-            padding: 16px 20px;
-            background-color: var(--surface-color);
-            font-size: 22px;
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            z-index: 10;
-        }
+        /* صفحة المصادر */
+        .add-source-box { background-color: var(--surface-color); padding: 15px; border-radius: 8px; display: flex; gap: 10px; margin-bottom: 20px; }
+        .source-input { flex: 1; padding: 10px; border-radius: 5px; border: none; background-color: #333; color: white; }
+        .source-btn { background-color: var(--primary-color); border: none; border-radius: 5px; padding: 10px 15px; font-weight: bold; cursor: pointer; }
+        .source-list { list-style: none; padding: 0; margin: 0; }
+        .source-item { background-color: var(--surface-color); padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; }
+        .source-icon { width: 30px; height: 30px; background-color: #444; border-radius: 50%; margin-left: 15px; display: flex; align-items: center; justify-content: center; }
 
-        main {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        nav {
-            display: flex;
-            background-color: var(--surface-color);
-            padding-bottom: env(safe-area-inset-bottom);
-            box-shadow: 0 -1px 4px rgba(0,0,0,0.3);
-            z-index: 10;
-        }
-
-        .nav-item {
-            flex: 1;
-            padding: 12px 0;
-            text-align: center;
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            transition: color 0.2s;
-        }
-
-        .nav-item.active {
-            color: var(--primary-color);
-        }
-
-        .icon {
-            font-size: 24px;
-        }
-
-        /* تصميم جديد للمكتبة */
-        .manga-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 12px;
-        }
-
-        .manga-card {
-            background-color: var(--surface-color);
-            border-radius: 8px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        .manga-cover {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            background-color: #333;
-        }
-
-        .manga-info {
-            padding: 8px;
-        }
-
-        .manga-title {
-            font-size: 12px;
-            font-weight: bold;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin: 0 0 4px 0;
-        }
-
-        .manga-chapters {
-            font-size: 10px;
-            color: var(--primary-color);
-            margin: 0;
-        }
-
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: var(--text-secondary);
-            margin-top: 50px;
-        }
-        .empty-state .emoji {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-secondary); margin-top: 50px; }
+        .empty-state .emoji { font-size: 40px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -146,70 +59,190 @@
 
     <main>
         <div id="library" class="tab-content active">
-            <div class="manga-grid" id="library-grid"></div>
+            <div class="manga-grid" id="library-grid">
+                <div class="empty-state" id="library-empty">
+                    <div class="emoji">(; ¯_¯)</div>
+                    <p>مكتبتك فارغة</p>
+                </div>
+            </div>
         </div>
 
-        <div id="updates" class="tab-content"><div class="empty-state"><div class="emoji">ಥ_ಥ</div><p>لا توجد تحديثات جديدة</p></div></div>
-        <div id="history" class="tab-content"><div class="empty-state"><div class="emoji">(; ¯_¯)</div><p>لم تقرأ شيئاً مؤخراً</p></div></div>
-        <div id="browse" class="tab-content"><p style="color: var(--text-secondary);">المصادر المتاحة:</p></div>
-        <div id="more" class="tab-content"><p>الإعدادات</p></div>
+        <div id="updates" class="tab-content"><div class="empty-state"><div class="emoji">ಥ_ಥ</div><p>لا توجد تحديثات</p></div></div>
+        <div id="history" class="tab-content"><div class="empty-state"><div class="emoji">(; ¯_¯)</div><p>لم تقرأ شيئاً</p></div></div>
+        
+        <div id="browse" class="tab-content">
+            <div class="add-source-box">
+                <input type="text" id="source-url" class="source-input" placeholder="أدخل رابط المصدر (مثال: manga-starz.net)">
+                <button class="source-btn" onclick="addSource()">إضافة</button>
+            </div>
+            <ul class="source-list" id="sources-ul">
+                </ul>
+        </div>
+
+        <div id="source-view" class="tab-content">
+            <h3 id="source-name" style="margin-top:0;"></h3>
+            <div class="manga-grid" id="source-manga-grid">
+                </div>
+        </div>
+
+        <div id="more" class="tab-content"><p style="padding:10px;">الإعدادات</p></div>
     </main>
 
     <nav>
         <div class="nav-item active" onclick="switchTab(event, 'library', 'المكتبة')"><span class="icon">📚</span><span>المكتبة</span></div>
         <div class="nav-item" onclick="switchTab(event, 'updates', 'التحديثات')"><span class="icon">🔄</span><span>التحديثات</span></div>
         <div class="nav-item" onclick="switchTab(event, 'history', 'السجل')"><span class="icon">🕒</span><span>السجل</span></div>
-        <div class="nav-item" onclick="switchTab(event, 'browse', 'تصفح')"><span class="icon">🌐</span><span>تصفح</span></div>
+        <div class="nav-item" onclick="switchTab(event, 'browse', 'المصادر')"><span class="icon">🌐</span><span>تصفح</span></div>
         <div class="nav-item" onclick="switchTab(event, 'more', 'المزيد')"><span class="icon">⚙️</span><span>المزيد</span></div>
     </nav>
 
+    <div id="manga-modal" class="modal">
+        <div class="modal-header"><button class="back-btn" onclick="closeDetails()">✕</button></div>
+        <img id="modal-img" class="modal-banner" src="" alt="">
+        <div class="modal-body">
+            <h1 id="modal-title" class="modal-title"></h1>
+            <p id="modal-author" class="modal-author"></p>
+            <p id="modal-desc" class="modal-desc"></p>
+            <button id="modal-action-btn" class="action-btn" onclick="handleAction()"></button>
+        </div>
+    </div>
+
     <script>
-        // 1. قاعدة البيانات المصغرة (هيكل البيانات)
-        const myLibraryData = [
-            {
-                id: 1,
-                title: "One Piece",
-                coverImage: "https://cdn.myanimelist.net/images/manga/2/253146.jpg",
-                totalChapters: 1115
-            },
-            {
-                id: 2,
-                title: "Attack on Titan",
-                coverImage: "https://cdn.myanimelist.net/images/manga/2/253146.jpg", // استبدلنا الرابط مؤقتا لتفادي مشاكل التحميل
-                totalChapters: 139
-            },
-            {
-                id: 3,
-                title: "Solo Leveling",
-                coverImage: "https://cdn.myanimelist.net/images/manga/3/222295.jpg",
-                totalChapters: 179
-            }
+        // الذاكرة المؤقتة للتطبيق
+        let myLibrary = []; // المكتبة الشخصية (فارغة في البداية)
+        let currentModalManga = null; // المانجا المفتوحة حالياً في التفاصيل
+
+        // محاكاة لخوادم المصادر (بيانات وهمية لجلبها)
+        const fakeInternetData = [
+            { id: 101, title: "Martial Peak", author: "مومو", description: "رحلة يانغ كاي نحو القمة للبحث عن القوة.", coverImage: "https://cdn.myanimelist.net/images/manga/1/157897.jpg", totalChapters: 3000 },
+            { id: 102, title: "The Beginning After The End", author: "TurtleMe", description: "الملك غراي يعاد تجسيده في عالم سحري.", coverImage: "https://cdn.myanimelist.net/images/manga/3/256614.jpg", totalChapters: 175 },
+            { id: 103, title: "Nano Machine", author: "Hanjung Wolya", description: "يتلقى تشون يو وون آلة نانو من المستقبل تغير مصيره.", coverImage: "https://cdn.myanimelist.net/images/manga/3/245388.jpg", totalChapters: 150 }
         ];
 
-        // 2. دالة توليد الواجهة الحقيقية
-        function renderLibrary() {
-            const grid = document.getElementById('library-grid');
-            grid.innerHTML = ''; // تفريغ المكتبة أولاً
+        // 1. إضافة مصدر جديد
+        function addSource() {
+            const urlInput = document.getElementById('source-url').value;
+            if(urlInput.trim() === "") return;
 
-            myLibraryData.forEach(manga => {
-                // صناعة البطاقة برمجياً
+            const ul = document.getElementById('sources-ul');
+            const li = document.createElement('li');
+            li.className = 'source-item';
+            // عند الضغط على المصدر يفتح صفحة الموقع
+            li.onclick = () => openSourceView(urlInput);
+            li.innerHTML = `
+                <div class="source-icon">🌐</div>
+                <div>
+                    <div style="font-weight: bold;">${urlInput}</div>
+                    <div style="font-size: 10px; color: var(--text-secondary);">عربي - تم الإضافة</div>
+                </div>
+            `;
+            ul.appendChild(li);
+            document.getElementById('source-url').value = ''; // تفريغ الحقل
+        }
+
+        // 2. فتح صفحة المصدر (محاكاة الموقع)
+        function openSourceView(sourceName) {
+            // إخفاء كل التبويبات وفتح تبويب الموقع
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById('source-view').classList.add('active');
+            document.getElementById('app-header').innerText = sourceName; // تغيير العنوان لاسم الموقع
+
+            const grid = document.getElementById('source-manga-grid');
+            grid.innerHTML = ''; 
+
+            // رسم البيانات القادمة من "الإنترنت الوهمي"
+            fakeInternetData.forEach(manga => {
                 const card = document.createElement('div');
                 card.className = 'manga-card';
+                // نمرر مصدر البيانات (الانترنت)
+                card.onclick = () => openDetails(manga, 'internet'); 
                 card.innerHTML = `
-                    <img src="${manga.coverImage}" class="manga-cover" alt="${manga.title}">
+                    <img src="${manga.coverImage}" class="manga-cover">
                     <div class="manga-info">
                         <p class="manga-title">${manga.title}</p>
-                        <p class="manga-chapters">${manga.totalChapters} فصل</p>
                     </div>
                 `;
                 grid.appendChild(card);
             });
         }
 
-        // تشغيل الدالة فور فتح التطبيق
-        renderLibrary();
+        // 3. فتح شاشة التفاصيل (تتصرف بذكاء حسب مصدر المانجا)
+        function openDetails(manga, origin) {
+            currentModalManga = manga; // حفظ المانجا الحالية
+            
+            document.getElementById('modal-title').innerText = manga.title;
+            document.getElementById('modal-author').innerText = manga.author;
+            document.getElementById('modal-desc').innerText = manga.description;
+            document.getElementById('modal-img').src = manga.coverImage;
+            
+            const actionBtn = document.getElementById('modal-action-btn');
+            
+            // إذا كانت المانجا جاية من الإنترنت -> الزر يكون "إضافة للمكتبة"
+            if(origin === 'internet') {
+                // نتحقق إذا كانت موجودة أصلاً في المكتبة
+                const exists = myLibrary.find(m => m.id === manga.id);
+                if(exists) {
+                    actionBtn.innerText = "في المكتبة ✓";
+                    actionBtn.style.backgroundColor = "#4CAF50";
+                } else {
+                    actionBtn.innerText = "إضافة إلى المكتبة ➕";
+                    actionBtn.style.backgroundColor = "var(--primary-color)";
+                }
+            } 
+            // إذا كانت المانجا في المكتبة -> الزر يكون "ابدأ القراءة"
+            else {
+                actionBtn.innerText = "ابدأ القراءة 📖";
+                actionBtn.style.backgroundColor = "var(--primary-color)";
+            }
 
-        // دالة التنقل بين الصفحات
+            document.getElementById('manga-modal').style.display = 'block';
+        }
+
+        function closeDetails() {
+            document.getElementById('manga-modal').style.display = 'none';
+        }
+
+        // 4. زر الأكشن في التفاصيل
+        function handleAction() {
+            const actionBtn = document.getElementById('modal-action-btn');
+            
+            if(actionBtn.innerText.includes("إضافة إلى المكتبة")) {
+                // إضافة المانجا لمصفوفة المكتبة
+                myLibrary.push(currentModalManga);
+                actionBtn.innerText = "في المكتبة ✓";
+                actionBtn.style.backgroundColor = "#4CAF50";
+                updateLibraryUI(); // تحديث واجهة المكتبة
+            } 
+            else if(actionBtn.innerText.includes("ابدأ القراءة")) {
+                alert("سيتم فتح القارئ قريباً!");
+            }
+        }
+
+        // 5. تحديث واجهة المكتبة
+        function updateLibraryUI() {
+            const grid = document.getElementById('library-grid');
+            const emptyState = document.getElementById('library-empty');
+            
+            if(myLibrary.length > 0) {
+                if(emptyState) emptyState.style.display = 'none';
+                grid.innerHTML = '';
+                myLibrary.forEach(manga => {
+                    const card = document.createElement('div');
+                    card.className = 'manga-card';
+                    card.onclick = () => openDetails(manga, 'library'); // نمرر مصدر البيانات (المكتبة)
+                    card.innerHTML = `
+                        <img src="${manga.coverImage}" class="manga-cover">
+                        <div class="manga-info">
+                            <p class="manga-title">${manga.title}</p>
+                            <p class="manga-chapters">${manga.totalChapters} فصل</p>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        // دالة التنقل بين الصفحات السفلية
         function switchTab(event, tabId, title) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
